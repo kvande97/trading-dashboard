@@ -11,7 +11,7 @@ import random
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="front-end/build", static_url_path="")
+app = Flask(__name__, static_folder="build", static_url_path="")
 
 if os.getenv("debug_mode"):
     app.config["DEBUG"] = True
