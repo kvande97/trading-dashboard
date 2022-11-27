@@ -1,28 +1,57 @@
 import React from "react";
-import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
-// import logo3 from "../assets/lb-bt.svg";
 import logo3 from "../assets/lw-bt.svg";
+import {
+  Container,
+  Navbar,
+  Nav,
+  NavDropdown,
+  Offcanvas,
+} from "react-bootstrap";
 import "./Header.css";
-// import { Dropdown } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faChartColumn,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 function Header() {
+  const navDropdownTitle = <FontAwesomeIcon icon={faUser} /> + " " + "Profile";
   return (
-      <Navbar sticky="top">
+    <>
+      <Navbar key={"md"} sticky="top" collapseOnSelect expand="md">
         <Container fluid>
-          <Navbar.Brand className="offset-1" href="/">
+          <Navbar.Brand className="col-xs-1 col-xs-1 offset-md-1" href="/">
             <img src={logo3} alt="logo" id="logo" />
           </Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-            <NavDropdown title="Profile">
+          <Navbar.Toggle aria-controls={`offcanvasToggle`} />
+          <Navbar.Offcanvas
+            id={`offcanvasToggle`}
+            aria-labelledby={`offcanvasLabel`}
+            placement="end"
+          >
+            <Offcanvas.Header closeButton>
+
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+              <Nav className="me-auto">
+                <Nav.Link href="/">
+                  Home <FontAwesomeIcon icon={faHouse} />
+                </Nav.Link>
+                <Nav.Link href="/dashboard">
+                  Dashboard <FontAwesomeIcon icon={faChartColumn} />
+                </Nav.Link>
+                <NavDropdown title="Profile" id={`offcanvasDropdown`}>
                   <NavDropdown.Item href="login">Login</NavDropdown.Item>
                   <NavDropdown.Item href="register">Register</NavDropdown.Item>
                   <NavDropdown.Item href="account">Account</NavDropdown.Item>
-            </NavDropdown >
-          </Nav>
+                </NavDropdown>
+              </Nav>
+            </Offcanvas.Body>
+          </Navbar.Offcanvas>
         </Container>
       </Navbar>
+    </>
   );
 }
 
