@@ -151,7 +151,7 @@ function DashboardPage() {
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col xs={12} md={6}>
           <Line
             className="chart"
             options={chartOptions}
@@ -159,7 +159,7 @@ function DashboardPage() {
             updateMode={"active"}
           />
         </Col>
-        <Col>
+        <Col xs={12} md={6}>
           <Line
             className="chart"
             options={chartOptions}

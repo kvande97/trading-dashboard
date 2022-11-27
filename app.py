@@ -7,7 +7,6 @@ import pandas as pd
 import requests
 import json
 import os
-import random
 
 load_dotenv()
 
@@ -24,7 +23,7 @@ else:
     api_oa_base = os.getenv("live_api_base")
     api_oa_acc = os.getenv("live_oa_acc")
     api_oa_key = os.getenv("live_oa_key")
-
+    
 
 @app.route("/")
 def home():
