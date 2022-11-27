@@ -66,7 +66,7 @@ function DashboardPage() {
     labels: pnlLabels,
     datasets: [
       {
-        label: "Pnl",
+        label: "Live Pnl",
         data: pnlValues,
         borderColor: "rgba(60, 49, 0, 0.3)",
         backgroundColor: "rgba(133, 82, 44, 0.5)",
