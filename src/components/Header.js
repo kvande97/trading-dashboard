@@ -16,7 +16,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function Header() {
-  const navDropdownTitle = <FontAwesomeIcon icon={faUser} /> + " " + "Profile";
   return (
     <>
       <Navbar key={"md"} sticky="top" collapseOnSelect expand="md">
