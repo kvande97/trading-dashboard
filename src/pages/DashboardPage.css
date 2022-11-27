@@ -3,15 +3,12 @@
     text-align: center;
 }
 
-.row {
-    margin-top: 25px;
-    margin-bottom: 25px;
-}
-
 .chart {
     border: 1px solid black;
     background-color: rgba(133, 82, 44, 0.2);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-    padding: 20px
+    padding: 20px;
+    margin: 20px;
 }
+
