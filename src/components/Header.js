@@ -30,9 +30,7 @@ function Header() {
             aria-labelledby={`offcanvasLabel`}
             placement="end"
           >
-            <Offcanvas.Header closeButton>
-
-            </Offcanvas.Header>
+            <Offcanvas.Header closeButton />
             <Offcanvas.Body>
               <Nav className="me-auto">
                 <Nav.Link href="/">
