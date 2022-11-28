@@ -12,10 +12,10 @@ load_dotenv()
 
 app = Flask(__name__, static_folder="build", static_url_path="")
 
-if os.getenv("debug_mode"):
+if os.getenv("debug_mode") == "True":
     app.config["DEBUG"] = True
 
-if os.getenv("demo_data"):
+if os.getenv("demo_data") == "True":
     api_oa_base = os.getenv("demo_api_base")
     api_oa_acc = os.getenv("demo_oa_acc")
     api_oa_key = os.getenv("demo_oa_key")
