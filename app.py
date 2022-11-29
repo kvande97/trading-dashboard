@@ -3,10 +3,13 @@ from dotenv import load_dotenv
 from dateutil import parser, tz
 from datetime import datetime
 from time import sleep
+import logging
 import pandas as pd
 import requests
 import json
 import os
+
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
@@ -36,12 +39,13 @@ def not_found(e):
 
 
 @app.route("/stream", methods=["GET", "POST"])
-def chart_data():  # streaming live data for charts
+def chart_data():  # streaming live data for chartssession
     if request.method == "POST":
         output = request.get_json()
         result = json.loads(output)
         post_speed = float(result["speed_input"])
 
+    session = requests.Session()
     def get_data():
         global run_get_data
         run_get_data = True
@@ -57,9 +61,9 @@ def chart_data():  # streaming live data for charts
             }
 
             ## -------------- SUMMARY DATA _ PNL / EQUITY CHARTS -------------- ##
-
+            
             summary_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/summary"
-            summary_response = requests.get(summary_url, headers=headers)
+            summary_response = session.get(summary_url, headers=headers)
             summary_balance = float(summary_response.json()["account"]["balance"])
             summary_pnl = float(summary_response.json()["account"]["unrealizedPL"])
             summary_equity = summary_balance + summary_pnl
@@ -67,7 +71,7 @@ def chart_data():  # streaming live data for charts
             ## -------------- TABLE DATA -------------- ##
 
             open_trades_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=OPEN&count=500"
-            open_trades_response = requests.get(open_trades_url, headers=headers)
+            open_trades_response = session.get(open_trades_url, headers=headers)
             open_trades = open_trades_response.json()["trades"]
 
             open_trades_list = []
@@ -79,7 +83,7 @@ def chart_data():  # streaming live data for charts
                 )
 
                 live_pricing_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/pricing?instruments={instrument}"
-                live_pricing_response = requests.get(live_pricing_url, headers=headers)
+                live_pricing_response = session.get(live_pricing_url, headers=headers)
                 live_pricing = live_pricing_response.json()
                 live_bid = live_pricing["prices"][0]["bids"][0]["price"]
                 live_ask = live_pricing["prices"][0]["asks"][0]["price"]
@@ -127,7 +131,7 @@ def chart_data():  # streaming live data for charts
                 )
 
             closed_trades_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500"
-            closed_trades_response = requests.get(closed_trades_url, headers=headers)
+            closed_trades_response = session.get(closed_trades_url, headers=headers)
             closed_trades = closed_trades_response.json()["trades"]
 
             closed_trades_list = []
@@ -239,7 +243,7 @@ def chart_data():  # streaming live data for charts
                 }
             )
 
-            sleep(2)
+            sleep(.2)
 
             yield f"data:{json_data}\n\n"
 
