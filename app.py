@@ -243,7 +243,7 @@ def chart_data():  # streaming live data for chartssession
                 }
             )
 
-            sleep(.2)
+            sleep(5)
 
             yield f"data:{json_data}\n\n"
 
