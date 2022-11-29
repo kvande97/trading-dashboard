@@ -97,10 +97,6 @@ function DashboardPage() {
 
     const handleStream = (e) => {
       const eData = JSON.parse(e.data);
-      if (equityData.labels.length === 60) {
-        equityData.labels.shift();
-        equityData.datasets[0].data.shift();
-      }
 
       if (pnlData.labels.length === 60) {
         pnlData.labels.shift();
@@ -133,12 +129,12 @@ function DashboardPage() {
     return () => {
       sse.close();
     };
-  }, []);
+  }, [liveEquityData.datasets, liveEquityData.labels, pnlData.datasets, pnlData.labels]);
 
   return (
-    <Container fluid className="chartsContainer">
+    <Container className="chartsContainer">
       <Row>
-        <h1>Main Dashboard</h1>
+        <h1>Live Dashboard</h1>
       </Row>
       <Row>
         <Col>
@@ -147,8 +143,7 @@ function DashboardPage() {
             options={chartOptions}
             data={equityData}
             updateMode={"active"}
-          />
-        </Col>
+          /></Col>
       </Row>
       <Row>
         <Col xs={12} md={6}>

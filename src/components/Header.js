@@ -11,8 +11,7 @@ import "./Header.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
-  faChartColumn,
-  faUser,
+  faChartColumn
 } from "@fortawesome/free-solid-svg-icons";
 
 function Header() {
@@ -20,7 +19,7 @@ function Header() {
     <>
       <Navbar key={"md"} sticky="top" collapseOnSelect expand="md">
         <Container fluid>
-          <Navbar.Brand className="col-xs-1 col-xs-1 offset-md-1" href="/">
+          <Navbar.Brand className="offset-md-1" href="/">
             <img src={logo3} alt="logo" id="logo" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls={`offcanvasToggle`} />
@@ -31,7 +30,7 @@ function Header() {
           >
             <Offcanvas.Header closeButton />
             <Offcanvas.Body>
-              <Nav className="me-auto">
+              <Nav className="col-md-6 offset-md-5 me-auto">
                 <Nav.Link href="/">
                   Home <FontAwesomeIcon icon={faHouse} />
                 </Nav.Link>
