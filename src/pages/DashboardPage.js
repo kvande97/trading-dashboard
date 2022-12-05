@@ -183,11 +183,13 @@ function DashboardPage() {
           </Col>
         </Row>
         <Row>
-          <DataGrid
-            className="table rdg-light"
-            columns={openColumns}
-            rows={openTrades}
-          />
+          <Col>
+            <DataGrid
+              className="table rdg-light"
+              columns={openColumns}
+              rows={openTrades}
+            />
+          </Col>
         </Row>
         <Row>
           <Col xs={12} md={6}>
@@ -208,11 +210,13 @@ function DashboardPage() {
           </Col>
         </Row>
         <Row>
-          <DataGrid
-            className="table rdg-light"
-            columns={closedColumns}
-            rows={closedTrades}
-          />
+          <Col>
+            <DataGrid
+              className="table rdg-light"
+              columns={closedColumns}
+              rows={closedTrades}
+            />
+          </Col>
         </Row>
       </Container>
     </>
