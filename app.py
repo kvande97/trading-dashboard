@@ -9,7 +9,9 @@ import logging
 import json
 import os
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+
+session = requests.Session()
 
 load_dotenv()
 
@@ -32,7 +34,7 @@ headers = {
     "Authorization": f"Bearer {api_oa_key}",
 }
     
-def get_closed_trades(session):
+def  get_closed_trades(session):
     closed_trades_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500"
     closed_trades_response = session.get(closed_trades_url, headers=headers)
     closed_trades = closed_trades_response.json()["trades"]
@@ -201,15 +203,19 @@ def not_found(e):
 
 @app.route("/stream", methods=["GET", "POST"])
 def chart_data():  # streaming live data for chartssession
-    session = requests.Session()
+    logging.info('--------------- chart_data() ---------------')
+    # session = requests.Session()
+    logging.info('--------------- session started ---------------')
     
     details_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}"
     details_response = session.get(details_url, headers=headers)
     details = details_response.json()
 
     def get_data():
+        logging.info("--------------- get_data() ---------------")
         closed_trades_list, equity_labels, equity_values = get_closed_trades(session)
         while True:
+            logging.info("--------------- running loop ---------------")
             polling_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/changes?sinceTransactionID={details['account']['lastTransactionID']}"
             polling_response = session.get(polling_url, headers=headers)
             changes = polling_response.json()['changes']
@@ -220,20 +226,15 @@ def chart_data():  # streaming live data for chartssession
             pnl = round(float(state['unrealizedPL']), 2)
             balance = round(equity-pnl, 2)
 
-            ## -------------- CLOSED TRADES -------------- ##
-
             if len(changes['tradesClosed']) != 0:
                 closed_trades_list, equity_labels, equity_values = get_closed_trades(session)
                 
-            ## -------------- OPEN TRADES -------------- ##
-
             if len(state['trades']) != 0:
                open_trades_list = get_open_trades(session)
                 
             else:
                 open_trades_list = []
 
-                    
             json_data = json.dumps(
                 {
                     "summary": {
@@ -242,12 +243,12 @@ def chart_data():  # streaming live data for chartssession
                         "pnl": pnl,
                         "balance": balance,
                     },
-                    "openTrades": {"rows": open_trades_list},
-                    "closedTrades": {"rows": closed_trades_list},
+                    "openTrades": open_trades_list,
+                    "closedTrades": closed_trades_list,
                     "equityCurve": {"time": equity_labels, "equity": equity_values},
                 }
             )
-
+            logging.info("--------------- sleeping ---------------")
             sleep(5)
 
             yield f"data:{json_data}\n\n"

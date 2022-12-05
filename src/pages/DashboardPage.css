@@ -1,6 +1,8 @@
 .chartsContainer {
     width: 90%;
     text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .chart {
@@ -10,5 +12,13 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
     padding: 20px;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
+.table {
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

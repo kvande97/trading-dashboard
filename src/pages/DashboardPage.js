@@ -14,6 +14,8 @@ import {
   Legend,
 } from "chart.js";
 
+import "react-data-grid/lib/styles.css";
+import DataGrid from "react-data-grid";
 
 function DashboardPage() {
   const [equityValues, setEquityValues] = useState([]);
@@ -22,6 +24,8 @@ function DashboardPage() {
   const [pnlLabels, setPnlLabels] = useState([]);
   const [liveEquityValues, setLiveEquityValues] = useState([]);
   const [liveEquityLabels, setLiveEquityLabels] = useState([]);
+  const [openTrades, setOpenTrades] = useState([]);
+  const [closedTrades, setClosedTrades] = useState([]);
 
   ChartJS.register(
     CategoryScale,
@@ -92,6 +96,34 @@ function DashboardPage() {
     ],
   };
 
+  const openColumns = [
+    // { key: "ID", name: "ID" },
+    { key: "Time", name: "Entry Time" },
+    { key: "Instrument", name: "Pair" },
+    { key: "Direction", name: "L/S" },
+    { key: "Entry", name: "Entry" },
+    { key: "Stop", name: "Stop" },
+    { key: "Target", name: "Target" },
+    { key: "TPR", name: "TPR" },
+    { key: "R", name: "R" },
+    { key: "PnL", name: "PnL" },
+    { key: "Price", name: "Price" },
+  ];
+  const closedColumns = [
+    // { key: "ID", name: "ID" },
+    { key: "EntryTime", name: "Entry Time" },
+    { key: "Instrument", name: "Pair" },
+    { key: "Direction", name: "L/S" },
+    { key: "Entry", name: "Entry" },
+    { key: "Stop", name: "Stop" },
+    { key: "Target", name: "Target" },
+    { key: "TPR", name: "TPR" },
+    { key: "R", name: "R" },
+    { key: "PnL", name: "PnL" },
+    { key: "ExitTime", name: "Exit Time" },
+    { key: "Exit", name: "Exit" },
+  ];
+
   useEffect(() => {
     const sse = new EventSource("/stream");
 
@@ -108,14 +140,17 @@ function DashboardPage() {
         liveEquityData.datasets[0].data.shift();
       }
 
-      setEquityLabels((current) => [...eData.equityCurve.time]);
-      setEquityValues((current) => [...eData.equityCurve.equity]);
+      setEquityLabels([...eData.equityCurve.time]);
+      setEquityValues([...eData.equityCurve.equity]);
 
       setPnlLabels((current) => [...current, eData.summary.time]);
       setPnlValues((current) => [...current, eData.summary.pnl]);
 
       setLiveEquityLabels((current) => [...current, eData.summary.time]);
       setLiveEquityValues((current) => [...current, eData.summary.equity]);
+
+      setOpenTrades([...eData.openTrades]);
+      setClosedTrades([...eData.closedTrades]);
     };
 
     sse.onmessage = (e) => {
@@ -129,41 +164,58 @@ function DashboardPage() {
     return () => {
       sse.close();
     };
-  }, [liveEquityData.datasets, liveEquityData.labels, pnlData.datasets, pnlData.labels]);
+  }, []);
 
   return (
-    <Container className="chartsContainer">
-      <Row>
-        <h1>Live Dashboard</h1>
-      </Row>
-      <Row>
-        <Col>
-          <Line
-            className="chart"
-            options={chartOptions}
-            data={equityData}
-            updateMode={"active"}
-          /></Col>
-      </Row>
-      <Row>
-        <Col xs={12} md={6}>
-          <Line
-            className="chart"
-            options={chartOptions}
-            data={pnlData}
-            updateMode={"active"}
+    <>
+      <Container className="chartsContainer">
+        <Row>
+          <h1>Live Dashboard</h1>
+        </Row>
+        <Row>
+          <Col>
+            <Line
+              className="chart"
+              options={chartOptions}
+              data={equityData}
+              updateMode={"active"}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <DataGrid
+            className="table rdg-light"
+            columns={openColumns}
+            rows={openTrades}
           />
-        </Col>
-        <Col xs={12} md={6}>
-          <Line
-            className="chart"
-            options={chartOptions}
-            data={liveEquityData}
-            updateMode={"active"}
+        </Row>
+        <Row>
+          <Col xs={12} md={6}>
+            <Line
+              className="chart"
+              options={chartOptions}
+              data={pnlData}
+              updateMode={"active"}
+            />
+          </Col>
+          <Col xs={12} md={6}>
+            <Line
+              className="chart"
+              options={chartOptions}
+              data={liveEquityData}
+              updateMode={"active"}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <DataGrid
+            className="table rdg-light"
+            columns={closedColumns}
+            rows={closedTrades}
           />
-        </Col>
-      </Row>
-    </Container>
+        </Row>
+      </Container>
+    </>
   );
 }
 
