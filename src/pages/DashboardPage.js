@@ -173,25 +173,6 @@ function DashboardPage() {
           <h1>Live Dashboard</h1>
         </Row>
         <Row>
-          <Col>
-            <Line
-              className="chart"
-              options={chartOptions}
-              data={equityData}
-              updateMode={"active"}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <DataGrid
-              className="table rdg-light"
-              columns={openColumns}
-              rows={openTrades}
-            />
-          </Col>
-        </Row>
-        <Row>
           <Col xs={12} md={6}>
             <Line
               className="chart"
@@ -212,7 +193,26 @@ function DashboardPage() {
         <Row>
           <Col>
             <DataGrid
-              className="table rdg-light"
+              className="table openTable rdg-light"
+              columns={openColumns}
+              rows={openTrades}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Line
+              className="chart"
+              options={chartOptions}
+              data={equityData}
+              updateMode={"active"}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <DataGrid
+              className="table closedTable rdg-light"
               columns={closedColumns}
               rows={closedTrades}
             />

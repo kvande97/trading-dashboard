@@ -22,3 +22,12 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.openTable {
+    max-height: 15vh;
+}
+
+.closedTable {
+    min-height: 10vh;
+    max-height: 25vh;
+}
