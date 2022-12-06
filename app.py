@@ -1,13 +1,19 @@
-from flask import Flask, Response, request, send_from_directory, stream_with_context
-from dotenv import load_dotenv
-from dateutil import parser, tz
+import json
+import logging
+import os
 from datetime import datetime
 from time import sleep
+
 import pandas as pd
 import requests
-import logging
-import json
-import os
+from dateutil import parser
+from dateutil import tz
+from dotenv import load_dotenv
+from flask import Flask
+from flask import request
+from flask import Response
+from flask import send_from_directory
+from flask import stream_with_context
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,61 +21,62 @@ session = requests.Session()
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="build", static_url_path="")
+app = Flask(__name__, static_folder='build', static_url_path='')
 
-if os.getenv("debug_mode") == "True":
-    app.config["DEBUG"] = True
+if os.getenv('debug_mode') == 'True':
+    app.config['DEBUG'] = True
 
-if os.getenv("demo_data") == "True":
-    api_oa_base = os.getenv("demo_api_base")
-    api_oa_acc = os.getenv("demo_oa_acc")
-    api_oa_key = os.getenv("demo_oa_key")
+if os.getenv('demo_data') == 'True':
+    api_oa_base = os.getenv('demo_api_base')
+    api_oa_acc = os.getenv('demo_oa_acc')
+    api_oa_key = os.getenv('demo_oa_key')
 else:
-    api_oa_base = os.getenv("live_api_base")
-    api_oa_acc = os.getenv("live_oa_acc")
-    api_oa_key = os.getenv("live_oa_key")
+    api_oa_base = os.getenv('live_api_base')
+    api_oa_acc = os.getenv('live_oa_acc')
+    api_oa_key = os.getenv('live_oa_key')
 
 headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {api_oa_key}",
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {api_oa_key}',
 }
-    
-def  get_closed_trades(session):
-    closed_trades_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500"
+
+
+def get_closed_trades(session):
+    closed_trades_url = (
+        f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500'
+    )
     closed_trades_response = session.get(closed_trades_url, headers=headers)
-    closed_trades = closed_trades_response.json()["trades"]
+    closed_trades = closed_trades_response.json()['trades']
 
     closed_trades_list = []
     closed_trades_df = []
     for idx, trade in enumerate(closed_trades):
-        id = int(trade["id"])
-        instrument = closed_trades[idx]["instrument"].replace("_", "/")
-        direction = (
-            "Long" if int(closed_trades[idx]["initialUnits"]) > 0 else "Short"
-        )
+        id = int(trade['id'])
+        instrument = closed_trades[idx]['instrument'].replace('_', '/')
+        direction = 'Long' if int(closed_trades[idx]['initialUnits']) > 0 else 'Short'
 
         entry_time = (
-            parser.parse(str(trade["openTime"]))
-            .astimezone(tz.gettz("US/Central"))
-            .strftime("%D %H:%M")
+            parser.parse(str(trade['openTime']))
+            .astimezone(tz.gettz('US/Central'))
+            .strftime('%D %H:%M')
         )
         exit_time = (
-            parser.parse(str(trade["closeTime"]))
-            .astimezone(tz.gettz("US/Central"))
-            .strftime("%D %H:%M")
+            parser.parse(str(trade['closeTime']))
+            .astimezone(tz.gettz('US/Central'))
+            .strftime('%D %H:%M')
         )
 
-        entry_price = float(trade["price"])
-        exit_price = float(trade["averageClosePrice"])
-        pnl = round(float(trade["realizedPL"]), 2)
+        entry_price = float(trade['price'])
+        exit_price = float(trade['averageClosePrice'])
+        pnl = round(float(trade['realizedPL']), 2)
         try:
-            stop_price = float(trade["stopLossOrder"]["price"])
-            target_price = float(trade["takeProfitOrder"]["price"])
+            stop_price = float(trade['stopLossOrder']['price'])
+            target_price = float(trade['takeProfitOrder']['price'])
             target_r = round(
                 abs(target_price - entry_price) / abs(entry_price - stop_price),
                 2,
             )
-            if direction == "Long":
+            if direction == 'Long':
                 net_r = round(
                     (exit_price - entry_price) / (entry_price - stop_price), 2
                 )
@@ -85,179 +92,194 @@ def  get_closed_trades(session):
 
         closed_trades_list.append(
             {
-                "ID": id,
-                "EntryTime": entry_time,
-                "Instrument": instrument,
-                "Direction": direction,
-                "Entry": entry_price,
-                "Stop": stop_price,
-                "Target": target_price,
-                "Exit": exit_price,
-                "ExitTime": exit_time,
-                "TPR": "{:.2f}".format(target_r),
-                "R": "{:.2f}".format(net_r),
-                "PnL": pnl,
+                'ID': id,
+                'EntryTime': entry_time,
+                'Instrument': instrument,
+                'Direction': direction,
+                'Entry': entry_price,
+                'Stop': stop_price,
+                'Target': target_price,
+                'Exit': exit_price,
+                'ExitTime': exit_time,
+                'TPR': '{:.2f}'.format(target_r),
+                'R': '{:.2f}'.format(net_r),
+                'PnL': pnl,
             }
         )
         closed_trades_df.append(
             {
-                "ID": id,
-                "EntryTime": entry_time,
-                "Instrument": instrument,
-                "Direction": direction,
-                "Entry": entry_price,
-                "Stop": stop_price,
-                "Target": target_price,
-                "Exit": exit_price,
-                "ExitTime": exit_time,
-                "TPR": target_r,
-                "R": net_r,
-                "PnL": pnl,
+                'ID': id,
+                'EntryTime': entry_time,
+                'Instrument': instrument,
+                'Direction': direction,
+                'Entry': entry_price,
+                'Stop': stop_price,
+                'Target': target_price,
+                'Exit': exit_price,
+                'ExitTime': exit_time,
+                'TPR': target_r,
+                'R': net_r,
+                'PnL': pnl,
             }
         )
 
         df = pd.DataFrame(closed_trades_df)
-        df = df.sort_values("ExitTime").copy().dropna().reset_index(drop=True)
-        df["CumR"] = df["R"].cumsum()
+        df = df.sort_values('ExitTime').copy().dropna().reset_index(drop=True)
+        df['CumR'] = df['R'].cumsum()
 
-        equity_labels = ["09-14 00:00"]
+        equity_labels = ['09-14 00:00']
         equity_values = [0]
         for i in range(len(df)):
             equity_labels.append(
-                parser.parse(df["ExitTime"][i])
-                .astimezone(tz.gettz("US/Central"))
-                .strftime("%m-%d %H:%M")
+                parser.parse(df['ExitTime'][i])
+                .astimezone(tz.gettz('US/Central'))
+                .strftime('%m-%d %H:%M')
             )
-            equity_values.append(df["CumR"][i])
-            
+            equity_values.append(df['CumR'][i])
+
     return closed_trades_list, equity_labels, equity_values
+
+
 def get_open_trades(session):
-    open_trades_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=OPEN&count=500"
+    open_trades_url = (
+        f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=OPEN&count=500'
+    )
     open_trades_response = session.get(open_trades_url, headers=headers)
-    open_trades = open_trades_response.json()["trades"]
+    open_trades = open_trades_response.json()['trades']
 
     open_trades_list = []
     for idx, trade in enumerate(open_trades):
-        id = int(trade["id"])
-        instrument = open_trades[idx]["instrument"]
-        direction = (
-            "Long" if int(open_trades[idx]["initialUnits"]) > 0 else "Short"
-        )
+        id = int(trade['id'])
+        instrument = open_trades[idx]['instrument']
+        direction = 'Long' if int(open_trades[idx]['initialUnits']) > 0 else 'Short'
 
-        live_pricing_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/pricing?instruments={instrument}"
+        live_pricing_url = f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/pricing?instruments={instrument}'
         live_pricing_response = session.get(live_pricing_url, headers=headers)
         live_pricing = live_pricing_response.json()
-        live_bid = live_pricing["prices"][0]["bids"][0]["price"]
-        live_ask = live_pricing["prices"][0]["asks"][0]["price"]
-        live_price = float(live_bid) if direction == "Long" else float(live_ask)
+        live_bid = live_pricing['prices'][0]['bids'][0]['price']
+        live_ask = live_pricing['prices'][0]['asks'][0]['price']
+        live_price = float(live_bid) if direction == 'Long' else float(live_ask)
 
-        instrument = instrument.replace("_", "/")
+        instrument = instrument.replace('_', '/')
 
         time = (
-            parser.parse(str(trade["openTime"]))
-            .astimezone(tz.gettz("US/Central"))
-            .strftime("%D %H:%M")
+            parser.parse(str(trade['openTime']))
+            .astimezone(tz.gettz('US/Central'))
+            .strftime('%D %H:%M')
         )
 
-        pnl = round(float(trade["unrealizedPL"]), 2)
-        entry_price = float(trade["price"])
-        stop_price = float(trade["stopLossOrder"]["price"])
-        target_price = float(trade["takeProfitOrder"]["price"])
+        pnl = round(float(trade['unrealizedPL']), 2)
+        entry_price = float(trade['price'])
+        stop_price = float(trade['stopLossOrder']['price'])
+        target_price = float(trade['takeProfitOrder']['price'])
         target_r = round(
             abs(target_price - entry_price) / abs(entry_price - stop_price), 2
         )
 
-        if direction == "Long":
-            live_r = round(
-                (live_price - entry_price) / (entry_price - stop_price), 2
-            )
+        if direction == 'Long':
+            live_r = round((live_price - entry_price) / (entry_price - stop_price), 2)
         else:
-            live_r = round(
-                (entry_price - live_price) / (stop_price - entry_price), 2
-            )
+            live_r = round((entry_price - live_price) / (stop_price - entry_price), 2)
 
         open_trades_list.append(
             {
-                "ID": id,
-                "Time": time,
-                "Instrument": instrument,
-                "Direction": direction,
-                "Entry": entry_price,
-                "Stop": stop_price,
-                "Target": target_price,
-                "Price": live_price,
-                "TPR": target_r,
-                "R": live_r,
-                "PnL": pnl,
+                'ID': id,
+                'Time': time,
+                'Instrument': instrument,
+                'Direction': direction,
+                'Entry': entry_price,
+                'Stop': stop_price,
+                'Target': target_price,
+                'Price': live_price,
+                'TPR': target_r,
+                'R': live_r,
+                'PnL': pnl,
             }
         )
-        return open_trades_list 
+        return open_trades_list
 
-@app.route("/")
+
+@app.route('/')
 def home():
-    return send_from_directory(app.static_folder, "index.html")
+    return send_from_directory(app.static_folder, 'index.html')
+
 
 @app.errorhandler(404)
 def not_found(e):
-    return app.send_static_file("index.html")
+    return app.send_static_file('index.html')
 
-@app.route("/stream", methods=["GET", "POST"])
+
+@app.route('/stream', methods=['GET', 'POST'])
 def chart_data():  # streaming live data for chartssession
     logging.info('--------------- chart_data() ---------------')
     # session = requests.Session()
     logging.info('--------------- session started ---------------')
-    
-    details_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}"
+
+    details_url = f'https://{api_oa_base}/v3/accounts/{api_oa_acc}'
     details_response = session.get(details_url, headers=headers)
     details = details_response.json()
 
     def get_data():
-        logging.info("--------------- get_data() ---------------")
+        logging.info('--------------- get_data() ---------------')
         closed_trades_list, equity_labels, equity_values = get_closed_trades(session)
         while True:
-            logging.info("--------------- running loop ---------------")
+            logging.info('--------------- running loop ---------------')
             polling_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/changes?sinceTransactionID={details['account']['lastTransactionID']}"
             polling_response = session.get(polling_url, headers=headers)
             changes = polling_response.json()['changes']
             state = polling_response.json()['state']
 
-            time = parser.parse(str(datetime.now())).astimezone(tz.gettz("US/Central")).strftime("%H:%M")
+            time = (
+                parser.parse(str(datetime.now()))
+                .astimezone(tz.gettz('US/Central'))
+                .strftime('%H:%M')
+            )
             equity = round(float(state['NAV']), 2)
             pnl = round(float(state['unrealizedPL']), 2)
-            balance = round(equity-pnl, 2)
+            balance = round(equity - pnl, 2)
 
             if len(changes['tradesClosed']) != 0:
-                closed_trades_list, equity_labels, equity_values = get_closed_trades(session)
-                
+                closed_trades_list, equity_labels, equity_values = get_closed_trades(
+                    session
+                )
+
+
+
+
+
+
+
+
+
             if len(state['trades']) != 0:
-               open_trades_list = get_open_trades(session)
-                
+                open_trades_list = get_open_trades(session)
+
             else:
                 open_trades_list = []
 
             json_data = json.dumps(
                 {
-                    "summary": {
-                        "time": time,
-                        "equity": equity,
-                        "pnl": pnl,
-                        "balance": balance,
+                    'summary': {
+                        'time': time,
+                        'equity': equity,
+                        'pnl': pnl,
+                        'balance': balance,
                     },
-                    "openTrades": open_trades_list,
-                    "closedTrades": closed_trades_list,
-                    "equityCurve": {"time": equity_labels, "equity": equity_values},
+                    'openTrades': open_trades_list,
+                    'closedTrades': closed_trades_list,
+                    'equityCurve': {'time': equity_labels, 'equity': equity_values},
                 }
             )
-            logging.info("--------------- sleeping ---------------")
+            logging.info('--------------- sleeping ---------------')
             sleep(5)
 
-            yield f"data:{json_data}\n\n"
+            yield f'data:{json_data}\n\n'
 
-    response = Response(stream_with_context(get_data()), mimetype="text/event-stream")
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["X-Accel-Buffering"] = "no"
+    response = Response(stream_with_context(get_data()), mimetype='text/event-stream')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['X-Accel-Buffering'] = 'no'
     return response
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()
