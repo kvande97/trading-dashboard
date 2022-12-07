@@ -271,7 +271,7 @@ def chart_data():  # streaming live data for chartssession
                 }
             )
             logging.info('--------------- sleeping ---------------')
-            sleep(5)
+            sleep(2.5)
 
             yield f'data:{json_data}\n\n'
 
