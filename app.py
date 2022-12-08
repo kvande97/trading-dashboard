@@ -243,14 +243,6 @@ def chart_data():  # streaming live data for chartssession
                     session
                 )
 
-
-
-
-
-
-
-
-
             if len(state['trades']) != 0:
                 open_trades_list = get_open_trades(session)
 
