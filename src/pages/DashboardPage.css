@@ -1,8 +1,10 @@
 .chartsContainer {
-    width: 90%;
     text-align: center;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+
+    /* guide */
+    /* border: 2px solid rgb(255, 0, 0);  */
 }
 
 .chart {
@@ -10,24 +12,52 @@
     background-color: rgba(133, 82, 44, 0.2);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+
+    /* guide */
+    /* border: 2px solid rgb(21, 255, 0);  */
+}
+
+.chartsContainer h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
 .table {
     border: 1px solid black;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    /* guide */
+    /* border: 2px solid rgb(0, 17, 255);  */
 }
 
 .openTable {
     max-height: 15vh;
+
+    /* guide */
+    /* border: 2px solid rgb(234, 0, 255);  */
 }
 
 .closedTable {
     min-height: 10vh;
     max-height: 25vh;
+
+    /* guide */
+    /* border: 2px solid rgb(255, 238, 0);  */
+}
+
+.row {
+    /* guide */
+    /* border: 2px dashed black; */
+    margin: 1rem;
+}
+.col {
+    /* guide */
+    /* border: 5px dashed rgb(73, 159, 216); */
 }
