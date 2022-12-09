@@ -20,7 +20,7 @@ function Header() {
       <Navbar key={"md"} sticky="top" collapseOnSelect expand="md">
         <Container fluid>
           <Navbar.Brand className="offset-md-1" href="/">
-            <img src={logo3} alt="logo" id="logo" />
+            <img src={logo3} alt="logo" className="logo" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls={`offcanvasToggle`} />
           <Navbar.Offcanvas
