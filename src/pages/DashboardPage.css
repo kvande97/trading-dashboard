@@ -53,11 +53,13 @@
 }
 
 .row {
+    margin: 1rem;
+
     /* guide */
     /* border: 2px dashed black; */
-    margin: 1rem;
 }
 .col {
     /* guide */
     /* border: 5px dashed rgb(73, 159, 216); */
+
 }
