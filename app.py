@@ -184,7 +184,7 @@ def get_open_trades(session):
         open_trades_list.append(
             {
                 'ID': id,
-                'Time': time,
+                'EntryTime': time,
                 'Instrument': instrument,
                 'Direction': direction,
                 'Entry': entry_price,
