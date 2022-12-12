@@ -70,6 +70,7 @@ function DashboardPage() {
     };
 
     sse.onerror = (e) => {
+      sse.close();
       setTimeout(() => {
         sse = new EventSource("/stream");
       }, 500);

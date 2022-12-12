@@ -262,8 +262,8 @@ def chart_data():  # streaming live data for chartssession
                     'equityCurve': {'time': equity_labels, 'equity': equity_values},
                 }
             )
-            logging.info('--------------- sleeping ---------------')
-            sleep(2.5)
+            logging.info('--------------- sleeping ---------------\n')
+            sleep(5)
 
             yield f'data:{json_data}\n\n'
 
