@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./DashboardPage.css";
 import { Col, Row, Container } from "react-bootstrap";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-} from "chart.js";
+import LineChart from "../components/LineChart";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
@@ -26,75 +15,6 @@ function DashboardPage() {
   const [liveEquityLabels, setLiveEquityLabels] = useState([]);
   const [openTrades, setOpenTrades] = useState([]);
   const [closedTrades, setClosedTrades] = useState([]);
-
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Filler,
-    Legend
-  );
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: false,
-        text: "Live Chart",
-      },
-    },
-  };
-
-  const equityData = {
-    labels: equityLabels,
-    datasets: [
-      {
-        label: "Equity",
-        data: equityValues,
-        borderColor: "rgba(60, 49, 0, 0.3)",
-        backgroundColor: "rgba(133, 82, 44, 0.5)",
-        fill: true,
-        tension: 0.2,
-        pointRadius: 0,
-      },
-    ],
-  };
-
-  const pnlData = {
-    labels: pnlLabels,
-    datasets: [
-      {
-        label: "Live Pnl",
-        data: pnlValues,
-        borderColor: "rgba(60, 49, 0, 0.3)",
-        backgroundColor: "rgba(133, 82, 44, 0.5)",
-        fill: true,
-        tension: 0.2,
-        pointRadius: 0,
-      },
-    ],
-  };
-
-  const liveEquityData = {
-    labels: liveEquityLabels,
-    datasets: [
-      {
-        label: "Live Equity",
-        data: liveEquityValues,
-        borderColor: "rgba(60, 49, 0, 0.3)",
-        backgroundColor: "rgba(133, 82, 44, 0.5)",
-        fill: true,
-        tension: 0.2,
-        pointRadius: 0,
-      },
-    ],
-  };
 
   const openColumns = [
     // { key: "ID", name: "ID" },
@@ -130,24 +50,16 @@ function DashboardPage() {
     const handleStream = (e) => {
       const eData = JSON.parse(e.data);
 
-      if (pnlData.labels.length === 60) {
-        pnlData.labels.shift();
-        pnlData.datasets[0].data.shift();
-      }
-
-      if (liveEquityData.labels.length === 60) {
-        liveEquityData.labels.shift();
-        liveEquityData.datasets[0].data.shift();
-      }
+      const numDataPoints = 60;
 
       setEquityLabels([...eData.equityCurve.time]);
       setEquityValues([...eData.equityCurve.equity]);
 
-      setPnlLabels((current) => [...current, eData.summary.time]);
-      setPnlValues((current) => [...current, eData.summary.pnl]);
+      setPnlLabels((current) => [...current, eData.summary.time].slice(-numDataPoints));
+      setPnlValues((current) => [...current, eData.summary.pnl].slice(-numDataPoints));
 
-      setLiveEquityLabels((current) => [...current, eData.summary.time]);
-      setLiveEquityValues((current) => [...current, eData.summary.equity]);
+      setLiveEquityLabels((current) => [...current, eData.summary.time].slice(-numDataPoints));
+      setLiveEquityValues((current) => [...current, eData.summary.equity].slice(-numDataPoints));
 
       setOpenTrades([...eData.openTrades]);
       setClosedTrades([...eData.closedTrades]);
@@ -158,7 +70,9 @@ function DashboardPage() {
     };
 
     sse.onerror = (e) => {
-      sse.close();
+      setTimeout(() => {
+        sse = new EventSource("/stream");
+      }, 500);
     };
 
     return () => {
@@ -174,20 +88,22 @@ function DashboardPage() {
         </Row>
         <Row>
           <Col xs={12} md={6}>
-            <Line
+          <LineChart
               className="chart"
-              options={chartOptions}
-              data={pnlData}
-              updateMode={"active"}
-            />
+              chartTitle="Live PnL"
+              chartLabel="$"
+              dataValues={pnlValues}
+              dataLabels={pnlLabels}
+              />
           </Col>
           <Col xs={12} md={6}>
-            <Line
+          <LineChart
               className="chart"
-              options={chartOptions}
-              data={liveEquityData}
-              updateMode={"active"}
-            />
+              chartTitle="Live Equity"
+              chartLabel="$"
+              dataValues={liveEquityValues}
+              dataLabels={liveEquityLabels}
+              />
           </Col>
         </Row>
         <Row>
@@ -196,16 +112,17 @@ function DashboardPage() {
               className="table openTable rdg-light"
               columns={openColumns}
               rows={openTrades}
-            />
+              />
           </Col>
         </Row>
         <Row>
           <Col>
-            <Line
+            <LineChart
               className="chart"
-              options={chartOptions}
-              data={equityData}
-              updateMode={"active"}
+              chartTitle="Equity Curve"
+              chartLabel="R"
+              dataValues={equityValues}
+              dataLabels={equityLabels}
             />
           </Col>
         </Row>
