@@ -32,24 +32,10 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
     margin-top: 1rem;
     margin-bottom: 1rem;
-
+    min-height: 10vh;
+    max-height: 20vh;
     /* guide */
     /* border: 2px solid rgb(0, 17, 255);  */
-}
-
-.openTable {
-    max-height: 15vh;
-
-    /* guide */
-    /* border: 2px solid rgb(234, 0, 255);  */
-}
-
-.closedTable {
-    min-height: 10vh;
-    max-height: 25vh;
-
-    /* guide */
-    /* border: 2px solid rgb(255, 238, 0);  */
 }
 
 .row {
