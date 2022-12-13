@@ -9,10 +9,7 @@ import {
 } from "react-bootstrap";
 import "./Header.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHouse,
-  faChartColumn
-} from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faChartColumn } from "@fortawesome/free-solid-svg-icons";
 
 function Header() {
   return (

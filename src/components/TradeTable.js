@@ -17,13 +17,7 @@ function TradeTable({ rows, exColumns }) {
     ...exColumns,
   ];
 
-  return (
-    <DataGrid
-      className="table rdg-light"
-      columns={columns}
-      rows={rows}
-    />
-  );
+  return <DataGrid className="table rdg-light" columns={columns} rows={rows} />;
 }
 
 export default TradeTable;

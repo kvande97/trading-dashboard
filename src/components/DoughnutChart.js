@@ -10,7 +10,7 @@ function DoughnutChart({ winrate, chartTitle }) {
     responsive: true,
     animation: {
       animateScale: true,
-    //   animateRotate: false,
+      animateRotate: true,
     },
     plugins: {
       legend: {
@@ -21,7 +21,6 @@ function DoughnutChart({ winrate, chartTitle }) {
         text: chartTitle,
       },
     },
-
   };
 
   const data = {
