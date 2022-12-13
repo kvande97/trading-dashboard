@@ -1,29 +1,10 @@
 import React from "react";
 import "./LineChart.css";
 import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-} from "chart.js";
+import { Chart } from "chart.js/auto";
 
 function LineChart({ dataValues, dataLabels, chartLabel, chartTitle }) {
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Filler,
-    Legend
-  );
+  Chart.register();
 
   const options = {
     responsive: true,
@@ -53,13 +34,7 @@ function LineChart({ dataValues, dataLabels, chartLabel, chartTitle }) {
     ],
   };
 
-  return (
-    <Line
-      className="chart"
-      options={options}
-      data={data}
-    />
-  );
+  return <Line className="lineChart" options={options} data={data} />;
 }
 
 export default LineChart;

@@ -40,7 +40,6 @@ headers = {
     'Authorization': f'Bearer {api_oa_key}',
 }
 
-
 def get_closed_trades(session):
     closed_trades_url = (
         f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500'
@@ -126,6 +125,7 @@ def get_closed_trades(session):
         df = pd.DataFrame(closed_trades_df)
         df = df.sort_values('ExitTime').copy().dropna().reset_index(drop=True)
         df['CumR'] = df['R'].cumsum()
+        win_rate = len(df.query('R > 0')) / len(df) * 100
 
         equity_labels = ['09-14 00:00']
         equity_values = [0]
@@ -137,7 +137,7 @@ def get_closed_trades(session):
             )
             equity_values.append(df['CumR'][i])
 
-    return closed_trades_list, equity_labels, equity_values
+    return closed_trades_list, equity_labels, equity_values, win_rate
 
 
 def get_open_trades(session):
@@ -221,7 +221,7 @@ def chart_data():  # streaming live data for chartssession
 
     def get_data():
         logging.info('--------------- get_data() ---------------')
-        closed_trades_list, equity_labels, equity_values = get_closed_trades(session)
+        closed_trades_list, equity_labels, equity_values, win_rate = get_closed_trades(session)
         while True:
             logging.info('--------------- running loop ---------------')
             polling_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/changes?sinceTransactionID={details['account']['lastTransactionID']}"
@@ -239,7 +239,7 @@ def chart_data():  # streaming live data for chartssession
             balance = round(equity - pnl, 2)
 
             if len(changes['tradesClosed']) != 0:
-                closed_trades_list, equity_labels, equity_values = get_closed_trades(
+                closed_trades_list, equity_labels, equity_values, win_rate = get_closed_trades(
                     session
                 )
 
@@ -251,11 +251,12 @@ def chart_data():  # streaming live data for chartssession
 
             json_data = json.dumps(
                 {
-                    'summary': {
+                    'liveData': {
                         'time': time,
                         'equity': equity,
                         'pnl': pnl,
                         'balance': balance,
+                        'winrate': win_rate,
                     },
                     'openTrades': open_trades_list,
                     'closedTrades': closed_trades_list,

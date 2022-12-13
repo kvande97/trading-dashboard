@@ -3,6 +3,7 @@ import "./DashboardPage.css";
 import { Col, Row, Container } from "react-bootstrap";
 import LineChart from "../components/LineChart";
 import TradeTable from "../components/TradeTable";
+import DoughnutChart from "../components/DoughnutChart";
 
 function DashboardPage() {
   const [equityValues, setEquityValues] = useState([]);
@@ -13,10 +14,9 @@ function DashboardPage() {
   const [liveEquityLabels, setLiveEquityLabels] = useState([]);
   const [openTrades, setOpenTrades] = useState([]);
   const [closedTrades, setClosedTrades] = useState([]);
+  const [winrate, setWinrate] = useState(0);
 
-  const openColumns = [
-    { key: "Price", name: "Price" },
-  ];
+  const openColumns = [{ key: "Price", name: "Price" }];
   const closedColumns = [
     { key: "ExitTime", name: "Exit Time" },
     { key: "Exit", name: "Exit" },
@@ -31,12 +31,21 @@ function DashboardPage() {
 
       setEquityLabels([...eData.equityCurve.time]);
       setEquityValues([...eData.equityCurve.equity]);
-      setPnlLabels((current) => [...current, eData.summary.time].slice(-numDataPoints));
-      setPnlValues((current) => [...current, eData.summary.pnl].slice(-numDataPoints));
-      setLiveEquityLabels((current) => [...current, eData.summary.time].slice(-numDataPoints));
-      setLiveEquityValues((current) => [...current, eData.summary.equity].slice(-numDataPoints));
+      setPnlLabels((current) =>
+        [...current, eData.liveData.time].slice(-numDataPoints)
+      );
+      setPnlValues((current) =>
+        [...current, eData.liveData.pnl].slice(-numDataPoints)
+      );
+      setLiveEquityLabels((current) =>
+        [...current, eData.liveData.time].slice(-numDataPoints)
+      );
+      setLiveEquityValues((current) =>
+        [...current, eData.liveData.equity].slice(-numDataPoints)
+      );
       setOpenTrades([...eData.openTrades]);
       setClosedTrades([...eData.closedTrades]);
+      setWinrate(eData.liveData.winrate);
     };
 
     sse.onmessage = (e) => {
@@ -57,34 +66,36 @@ function DashboardPage() {
 
   return (
     <>
-      <Container className="chartsContainer">
+      <Container className="container">
         <Row>
           <h1>Live Dashboard</h1>
         </Row>
         <Row>
           <Col xs={12} md={6}>
-          <LineChart
+            <DoughnutChart chartTitle="Winrate %" winrate={winrate} />
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12} md={6}>
+            <LineChart
               chartTitle="Live PnL"
               chartLabel="$"
               dataValues={pnlValues}
               dataLabels={pnlLabels}
-              />
+            />
           </Col>
           <Col xs={12} md={6}>
-          <LineChart
+            <LineChart
               chartTitle="Live Equity"
               chartLabel="$"
               dataValues={liveEquityValues}
               dataLabels={liveEquityLabels}
-              />
+            />
           </Col>
         </Row>
         <Row>
           <Col>
-            <TradeTable
-              rows={openTrades}
-              exColumns={openColumns}
-              />
+            <TradeTable rows={openTrades} exColumns={openColumns} />
           </Col>
         </Row>
         <Row>
@@ -99,10 +110,7 @@ function DashboardPage() {
         </Row>
         <Row>
           <Col>
-            <TradeTable
-              rows={closedTrades}
-              exColumns={closedColumns}
-            />
+            <TradeTable rows={closedTrades} exColumns={closedColumns} />
           </Col>
         </Row>
       </Container>

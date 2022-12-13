@@ -1,25 +1,22 @@
-.chartsContainer {
-    text-align: center;
+.container {
+    text-align: center;;
     margin-top: 3rem;
     margin-bottom: 3rem;
 
     /* guide */
-    /* border: 2px solid rgb(255, 0, 0);  */
+    /* border: 3px solid red;  */
 }
 
-.chartsContainer h1 {
+.container h1 {
     font-size: 2rem;
-    margin-bottom: 1rem;
 }
 
 .row {
-    margin: 1rem;
-
     /* guide */
-    /* border: 2px dashed black; */
+    /* border: 3px solid green; */
 }
 .col {
-    /* guide */
-    /* border: 5px dashed rgb(73, 159, 216); */
 
+    /* guide */
+    /* border: 3px solid blue; */
 }
