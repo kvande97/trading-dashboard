@@ -1,6 +1,7 @@
 import React from "react";
-import "react-data-grid/lib/styles.css";
+import "./TradeTable.css";
 import DataGrid from "react-data-grid";
+import "react-data-grid/lib/styles.css";
 
 function TradeTable({ rows, exColumns }) {
   const columns = [

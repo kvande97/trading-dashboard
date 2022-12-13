@@ -1,0 +1,11 @@
+.table {
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  min-height: 10vh;
+  max-height: 20vh;
+  /* guide */
+  /* border: 2px solid rgb(0, 17, 255);  */
+}

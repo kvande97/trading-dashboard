@@ -4,9 +4,6 @@ import { Col, Row, Container } from "react-bootstrap";
 import LineChart from "../components/LineChart";
 import TradeTable from "../components/TradeTable";
 
-import "react-data-grid/lib/styles.css";
-import DataGrid from "react-data-grid";
-
 function DashboardPage() {
   const [equityValues, setEquityValues] = useState([]);
   const [equityLabels, setEquityLabels] = useState([]);
