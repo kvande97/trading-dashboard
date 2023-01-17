@@ -57,12 +57,12 @@ def get_closed_trades(session):
         entry_time = (
             parser.parse(str(trade['openTime']))
             .astimezone(tz.gettz('US/Central'))
-            .strftime('%D %H:%M')
+            .strftime('%m-%d-%y %H:%M')
         )
         exit_time = (
             parser.parse(str(trade['closeTime']))
             .astimezone(tz.gettz('US/Central'))
-            .strftime('%D %H:%M')
+            .strftime('%m-%d-%y %H:%M')
         )
 
         entry_price = float(trade['price'])
@@ -123,17 +123,19 @@ def get_closed_trades(session):
         )
 
         df = pd.DataFrame(closed_trades_df)
-        df = df.sort_values('ExitTime').copy().dropna().reset_index(drop=True)
+        df['Sorter'] = pd.to_datetime(df['ExitTime'])
+        df = df.sort_values('Sorter').copy().dropna().reset_index(drop=True)
+        df.drop('Sorter', axis=1, inplace=True)
         df['CumR'] = df['R'].cumsum()
         win_rate = len(df.query('R > 0')) / len(df) * 100
 
-        equity_labels = ['09-14 00:00']
+        equity_labels = ['09-14-22 00:00']
         equity_values = [0]
         for i in range(len(df)):
             equity_labels.append(
                 parser.parse(df['ExitTime'][i])
                 .astimezone(tz.gettz('US/Central'))
-                .strftime('%m-%d %H:%M')
+                .strftime('%m-%d-%y %H:%M')
             )
             equity_values.append(df['CumR'][i])
 
