@@ -129,15 +129,17 @@ def get_closed_trades(session):
         df['CumR'] = df['R'].cumsum()
         win_rate = len(df.query('R > 0')) / len(df) * 100
 
-        equity_labels = ['09-14-22 00:00']
+        equity_labels = ['09-14-22']
         equity_values = [0]
         for i in range(len(df)):
             equity_labels.append(
                 parser.parse(df['ExitTime'][i])
                 .astimezone(tz.gettz('US/Central'))
-                .strftime('%m-%d-%y %H:%M')
+                .strftime('%m-%d-%y')
             )
+            print(df['ExitTime'][i])
             equity_values.append(df['CumR'][i])
+
 
     return closed_trades_list, equity_labels, equity_values, win_rate
 
