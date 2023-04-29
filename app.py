@@ -70,6 +70,12 @@ def get_closed_trades(session):
         pnl = round(float(trade['realizedPL']), 2)
         try:
             stop_price = float(trade['stopLossOrder']['price'])
+            if stop_price == entry_price:
+                stop_order = trade['stopLossOrder']['replacesOrderID']
+                stop_order_url = (f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}')
+                stop_order_response = session.get(stop_order_url, headers=headers)
+                stop_price = float(stop_order_response.json()['order']['price'])
+
             target_price = float(trade['takeProfitOrder']['price'])
             target_r = round(
                 abs(target_price - entry_price) / abs(entry_price - stop_price),
@@ -84,6 +90,7 @@ def get_closed_trades(session):
                     (entry_price - exit_price) / (stop_price - entry_price), 2
                 )
         except Exception as e:
+            print(e)
             stop_price = None
             target_price = None
             target_r = None
