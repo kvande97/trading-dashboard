@@ -13,7 +13,7 @@ function TradeTable({ rows, exColumns }) {
     { key: "Target", name: "Target" },
     { key: "TPR", name: "TPR" },
     { key: "R", name: "R" },
-    { key: "PnL", name: "PnL" },
+    // { key: "PnL", name: "PnL" },
     ...exColumns,
   ];
 

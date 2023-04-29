@@ -74,24 +74,24 @@ function DashboardPage() {
           <Col xs={12} md={6}>
             <DoughnutChart chartTitle="Winrate %" winrate={winrate} />
           </Col>
-        </Row>
-        <Row>
           <Col xs={12} md={6}>
             <LineChart
               chartTitle="Live PnL"
-              chartLabel="$"
+              chartLabel="R"
               dataValues={pnlValues}
               dataLabels={pnlLabels}
             />
           </Col>
-          <Col xs={12} md={6}>
+        </Row>
+        <Row>
+          {/* <Col xs={12} md={6}>
             <LineChart
               chartTitle="Live Equity"
               chartLabel="$"
               dataValues={liveEquityValues}
               dataLabels={liveEquityLabels}
             />
-          </Col>
+          </Col> */}
         </Row>
         <Row>
           <Col>

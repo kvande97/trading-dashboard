@@ -59,6 +59,11 @@ def get_closed_trades(session):
             .astimezone(tz.gettz('US/Central'))
             .strftime('%m-%d-%y %H:%M')
         )
+        # convert entry_time to datetime object
+        entry_time_compare = parser.parse(entry_time)
+        if entry_time_compare < datetime(2023, 3, 1):
+            continue
+
         exit_time = (
             parser.parse(str(trade['closeTime']))
             .astimezone(tz.gettz('US/Central'))
@@ -144,9 +149,7 @@ def get_closed_trades(session):
                 .astimezone(tz.gettz('US/Central'))
                 .strftime('%m-%d-%y')
             )
-            print(df['ExitTime'][i])
             equity_values.append(df['CumR'][i])
-
 
     return closed_trades_list, equity_labels, equity_values, win_rate
 
@@ -182,6 +185,13 @@ def get_open_trades(session):
         pnl = round(float(trade['unrealizedPL']), 2)
         entry_price = float(trade['price'])
         stop_price = float(trade['stopLossOrder']['price'])
+        if stop_price == entry_price:
+            stop_order = trade['stopLossOrder']['replacesOrderID']
+            stop_order_url = (f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}')
+            stop_order_response = session.get(stop_order_url, headers=headers)
+            stop_price = float(stop_order_response.json()['order']['price'])
+
+
         target_price = float(trade['takeProfitOrder']['price'])
         target_r = round(
             abs(target_price - entry_price) / abs(entry_price - stop_price), 2
@@ -256,16 +266,18 @@ def chart_data():  # streaming live data for chartssession
 
             if len(state['trades']) != 0:
                 open_trades_list = get_open_trades(session)
+                live_r = 0
 
             else:
                 open_trades_list = []
+                live_r = sum(open_trades_list[idx]['R'] for idx in range(len(open_trades_list)))
 
             json_data = json.dumps(
                 {
                     'liveData': {
                         'time': time,
                         'equity': equity,
-                        'pnl': pnl,
+                        'pnl': live_r,
                         'balance': balance,
                         'winrate': win_rate,
                     },
