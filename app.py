@@ -40,6 +40,7 @@ headers = {
     'Authorization': f'Bearer {api_oa_key}',
 }
 
+
 def get_closed_trades(session):
     closed_trades_url = (
         f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/trades?state=CLOSED&count=500'
@@ -77,7 +78,7 @@ def get_closed_trades(session):
             stop_price = float(trade['stopLossOrder']['price'])
             if stop_price == entry_price:
                 stop_order = trade['stopLossOrder']['replacesOrderID']
-                stop_order_url = (f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}')
+                stop_order_url = f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}'
                 stop_order_response = session.get(stop_order_url, headers=headers)
                 stop_price = float(stop_order_response.json()['order']['price'])
 
@@ -141,7 +142,11 @@ def get_closed_trades(session):
         df['CumR'] = df['R'].cumsum()
         win_rate = len(df.query('R > 0')) / len(df) * 100
 
-        equity_labels = ['09-14-22']
+        equity_labels = [
+            parser.parse(df['ExitTime'][0])
+            .astimezone(tz.gettz('US/Central'))
+            .strftime('%m-%d-%y')
+        ]
         equity_values = [0]
         for i in range(len(df)):
             equity_labels.append(
@@ -187,10 +192,11 @@ def get_open_trades(session):
         stop_price = float(trade['stopLossOrder']['price'])
         if stop_price == entry_price:
             stop_order = trade['stopLossOrder']['replacesOrderID']
-            stop_order_url = (f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}')
+            stop_order_url = (
+                f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}'
+            )
             stop_order_response = session.get(stop_order_url, headers=headers)
             stop_price = float(stop_order_response.json()['order']['price'])
-
 
         target_price = float(trade['takeProfitOrder']['price'])
         target_r = round(
@@ -242,7 +248,9 @@ def chart_data():  # streaming live data for chartssession
 
     def get_data():
         logging.info('--------------- get_data() ---------------')
-        closed_trades_list, equity_labels, equity_values, win_rate = get_closed_trades(session)
+        closed_trades_list, equity_labels, equity_values, win_rate = get_closed_trades(
+            session
+        )
         while True:
             logging.info('--------------- running loop ---------------')
             polling_url = f"https://{api_oa_base}/v3/accounts/{api_oa_acc}/changes?sinceTransactionID={details['account']['lastTransactionID']}"
@@ -260,9 +268,12 @@ def chart_data():  # streaming live data for chartssession
             balance = round(equity - pnl, 2)
 
             if len(changes['tradesClosed']) != 0:
-                closed_trades_list, equity_labels, equity_values, win_rate = get_closed_trades(
-                    session
-                )
+                (
+                    closed_trades_list,
+                    equity_labels,
+                    equity_values,
+                    win_rate,
+                ) = get_closed_trades(session)
 
             if len(state['trades']) != 0:
                 open_trades_list = get_open_trades(session)
@@ -270,7 +281,9 @@ def chart_data():  # streaming live data for chartssession
 
             else:
                 open_trades_list = []
-                live_r = sum(open_trades_list[idx]['R'] for idx in range(len(open_trades_list)))
+                live_r = sum(
+                    open_trades_list[idx]['R'] for idx in range(len(open_trades_list))
+                )
 
             json_data = json.dumps(
                 {
