@@ -275,15 +275,11 @@ def chart_data():  # streaming live data for chartssession
                     win_rate,
                 ) = get_closed_trades(session)
 
-            if len(state['trades']) != 0:
-                open_trades_list = get_open_trades(session)
-                live_r = 0
+            open_trades_list = [] if len(state['trades']) == 0 else  get_open_trades(session)
 
-            else:
-                open_trades_list = []
-                live_r = sum(
-                    open_trades_list[idx]['R'] for idx in range(len(open_trades_list))
-                )
+            live_r = sum(
+                open_trades_list[idx]['R'] for idx in range(len(open_trades_list))
+            )
 
             json_data = json.dumps(
                 {
