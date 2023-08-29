@@ -103,15 +103,13 @@ def get_closed_trades(session):
                     (entry_price - exit_price) / (stop_price - entry_price), 2
                 )
 
-            if target_r == None:
-                continue
-
         except Exception as e:
             print(e)
             stop_price = None
             target_price = None
             target_r = None
             net_r = None
+            continue
 
         closed_trades_list.append(
             {
