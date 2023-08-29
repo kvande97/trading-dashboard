@@ -30,10 +30,12 @@ if os.getenv('demo_data') == 'True':
     api_oa_base = os.getenv('demo_api_base')
     api_oa_acc = os.getenv('demo_oa_acc')
     api_oa_key = os.getenv('demo_oa_key')
+    demo_data = True
 else:
     api_oa_base = os.getenv('live_api_base')
     api_oa_acc = os.getenv('live_oa_acc')
     api_oa_key = os.getenv('live_oa_key')
+    demo_data = False
 
 headers = {
     'Content-Type': 'application/json',
@@ -51,6 +53,7 @@ def get_closed_trades(session):
     closed_trades_list = []
     closed_trades_df = []
     for idx, trade in enumerate(closed_trades):
+
         id = int(trade['id'])
         instrument = closed_trades[idx]['instrument'].replace('_', '/')
         direction = 'Long' if int(closed_trades[idx]['initialUnits']) > 0 else 'Short'
@@ -76,6 +79,8 @@ def get_closed_trades(session):
         pnl = round(float(trade['realizedPL']), 2)
         try:
             stop_price = float(trade['stopLossOrder']['price'])
+            if demo_data and stop_price == None:
+                continue
             if stop_price == entry_price:
                 stop_order = trade['stopLossOrder']['replacesOrderID']
                 stop_order_url = f'https://{api_oa_base}/v3/accounts/{api_oa_acc}/orders/{stop_order}'
@@ -83,6 +88,8 @@ def get_closed_trades(session):
                 stop_price = float(stop_order_response.json()['order']['price'])
 
             target_price = float(trade['takeProfitOrder']['price'])
+            if demo_data and target_price == None:
+                continue
             target_r = round(
                 abs(target_price - entry_price) / abs(entry_price - stop_price),
                 2,
